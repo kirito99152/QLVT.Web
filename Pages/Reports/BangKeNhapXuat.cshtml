@@ -8,6 +8,18 @@
 
 <form method="get">
     <div class="row">
+        @if (User.IsInRole("CongTy"))
+        {
+            <div class="col-md-3">
+                <div class="form-group">
+                    <label>Chi nhánh</label>
+                    <select name="branch" class="form-control" asp-items="Model.ChiNhanhSelectList">
+                        <option value="">-- Tất cả chi nhánh --</option>
+                    </select>
+                </div>
+            </div>
+        }
+
         <div class="col-md-3">
             <div class="form-group">
                 <label>Loại phiếu</label>
@@ -31,7 +43,7 @@
         </div>
         <div class="col-md-3 align-self-end">
             <div class="form-group">
-                <button type="submit" class="btn btn-success" asp-page-handler="Export">Xuất Excel</button>
+                <button type="submit" class="btn btn-success" name="action" value="export">Xuất Excel</button>
             </div>
         </div>
     </div>
@@ -39,7 +51,7 @@
 
 <p class="mt-3">
     <strong>Lưu ý:</strong> Báo cáo này sẽ được xuất trực tiếp ra file Excel. <br/>
-    - Nếu bạn đăng nhập với quyền <strong>Công ty</strong>, báo cáo sẽ tổng hợp dữ liệu từ cả 2 chi nhánh. <br/>
+    - Nếu bạn đăng nhập với quyền <strong>Công ty</strong>, bạn có thể chọn xem báo cáo cho một chi nhánh cụ thể hoặc tổng hợp từ tất cả các chi nhánh. <br/>
     - Nếu bạn đăng nhập với quyền <strong>Chi nhánh</strong> hoặc <strong>User</strong>, báo cáo sẽ chỉ bao gồm dữ liệu từ chi nhánh của bạn.
 </p>
 

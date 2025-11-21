@@ -6,37 +6,33 @@
 <form method="post">
     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
+    <!-- Thêm trường ẩn để lưu MasoDdh -->
+    <input type="hidden" asp-for="Input.MasoDdh" />
+
     <h4>Thông tin chung</h4>
     <hr />
     <div class="row">
         <div class="col-md-4">
             <div class="form-group">
-                <label asp-for="DatHang.MasoDdh" class="control-label"></label>
-                <input asp-for="DatHang.MasoDdh" class="form-control" />
-                <span asp-validation-for="DatHang.MasoDdh" class="text-danger"></span>
+                <label asp-for="Input.Ngay" class="control-label"></label>
+                <input asp-for="Input.Ngay" class="form-control" type="date" />
+                <span asp-validation-for="Input.Ngay" class="text-danger"></span>
             </div>
         </div>
         <div class="col-md-4">
             <div class="form-group">
-                <label asp-for="DatHang.Ngay" class="control-label"></label>
-                <input asp-for="DatHang.Ngay" class="form-control" type="date" />
-                <span asp-validation-for="DatHang.Ngay" class="text-danger"></span>
+                <label asp-for="Input.NhaCc" class="control-label"></label>
+                <input asp-for="Input.NhaCc" class="form-control" />
+                <span asp-validation-for="Input.NhaCc" class="text-danger"></span>
             </div>
         </div>
         <div class="col-md-4">
             <div class="form-group">
-                <label asp-for="DatHang.NhaCc" class="control-label"></label>
-                <input asp-for="DatHang.NhaCc" class="form-control" />
-                <span asp-validation-for="DatHang.NhaCc" class="text-danger"></span>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="form-group">
-                <label asp-for="DatHang.Makho" class="control-label"></label>
-                <select asp-for="DatHang.Makho" class="form-control" asp-items="Model.KhoSelectList">
+                <label asp-for="Input.Makho" class="control-label"></label>
+                <select asp-for="Input.Makho" class="form-control" asp-items="Model.KhoSelectList">
                     <option value="">-- Chọn kho --</option>
                 </select>
-                <span asp-validation-for="DatHang.Makho" class="text-danger"></span>
+                <span asp-validation-for="Input.Makho" class="text-danger"></span>
             </div>
         </div>
     </div>
@@ -88,9 +84,9 @@
             newRow.removeAttribute("id");
 
             // Cập nhật thuộc tính 'name' cho các input để model binding hoạt động
-            newRow.querySelector(".item-vattu").name = `ChiTietDatHangs[${rowIndex}].Mavt`;
-            newRow.querySelector(".item-soluong").name = `ChiTietDatHangs[${rowIndex}].Soluong`;
-            newRow.querySelector(".item-dongia").name = `ChiTietDatHangs[${rowIndex}].Dongia`;
+            newRow.querySelector(".item-vattu").name = `Input.ChiTiet[${rowIndex}].Mavt`;
+            newRow.querySelector(".item-soluong").name = `Input.ChiTiet[${rowIndex}].Soluong`;
+            newRow.querySelector(".item-dongia").name = `Input.ChiTiet[${rowIndex}].Dongia`;
 
             document.querySelector("#chiTietTable tbody").appendChild(newRow);
             rowIndex++;
@@ -106,9 +102,9 @@
             const rows = document.querySelectorAll("#chiTietTable tbody tr:not(#row_template)");
             rowIndex = 0;
             rows.forEach(row => {
-                row.querySelector(".item-vattu").name = `ChiTietDatHangs[${rowIndex}].Mavt`;
-                row.querySelector(".item-soluong").name = `ChiTietDatHangs[${rowIndex}].Soluong`;
-                row.querySelector(".item-dongia").name = `ChiTietDatHangs[${rowIndex}].Dongia`;
+                row.querySelector(".item-vattu").name = `Input.ChiTiet[${rowIndex}].Mavt`;
+                row.querySelector(".item-soluong").name = `Input.ChiTiet[${rowIndex}].Soluong`;
+                row.querySelector(".item-dongia").name = `Input.ChiTiet[${rowIndex}].Dongia`;
                 rowIndex++;
             });
         }

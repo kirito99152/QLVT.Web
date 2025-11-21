@@ -95,8 +95,8 @@ namespace QLVT.Web.Services
                 var chiNhanhLookups = chiNhanhs.Select(cn => new ChiNhanhLookup
                 {
                     Macn = cn.Macn, // Chỉ đồng bộ mã và tên chi nhánh
-                    ChiNhanh1 = cn.ChiNhanh1
-                    // Không cần đồng bộ Diachi và SoDt cho lookup
+                    ChiNhanh1 = cn.ChiNhanh1,
+                    // Diachi và SoDt không có trong ChiNhanhLookup
                 });
                 await lookupDbContext.ChiNhanhs.AddRangeAsync(chiNhanhLookups, cancellationToken);
 

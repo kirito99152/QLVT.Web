@@ -24,10 +24,7 @@ public class CreateModel : PageModel
     }
 
     [BindProperty]
-    public QLVT.Web.Data.Models.DatHang DatHang { get; set; } = new() { Ngay = DateOnly.FromDateTime(DateTime.Now) };
-
-    [BindProperty]
-    public List<Ctddh> ChiTietDatHangs { get; set; } = new();
+    public CreateDatHangInputModel Input { get; set; } = new();
 
     public SelectList? KhoSelectList { get; set; }
     public SelectList? VatTuSelectList { get; set; }
@@ -35,56 +32,66 @@ public class CreateModel : PageModel
     public async Task<IActionResult> OnGetAsync()
     {
         await PopulateSelectListsAsync();
+
+        // Tạo một mã DDH ngẫu nhiên gồm 8 ký tự và đảm bảo nó là duy nhất
+        var db = _branchDb.DbContext;
+        string newId;
+        do
+        {
+            newId = GenerateRandomId(8);
+        }
+        while (await db.DatHangs.AnyAsync(d => d.MasoDdh == newId));
+
+        Input.MasoDdh = newId;
+
         return Page();
     }
 
     public async Task<IActionResult> OnPostAsync()
     {
-        var db = _branchDb.DbContext;
-
-        if (ChiTietDatHangs.Count == 0)
+        // Kiểm tra validation trên Input Model
+        // ModelState bây giờ sẽ hoạt động chính xác vì Input Model khớp với dữ liệu từ form
+        if (Input.ChiTiet.Count == 0)
         {
             ModelState.AddModelError("", "Đơn đặt hàng phải có ít nhất một vật tư.");
         }
 
-        // Kiểm tra trùng mã DDH
-        var exists = await db.DatHangs.AnyAsync(d => d.MasoDdh == DatHang.MasoDdh);
-        if (exists)
-        {
-            ModelState.AddModelError("DatHang.MasoDdh", "Mã số đơn đặt hàng đã tồn tại.");
-        }
-
         if (!ModelState.IsValid)
         {
+            // Nếu không hợp lệ, tải lại các SelectList và hiển thị lại trang với lỗi
             await PopulateSelectListsAsync();
             return Page();
         }
 
-        // Gán nhân viên lập phiếu
+        // Nếu ModelState hợp lệ, tiến hành ánh xạ từ ViewModel sang Entity Model
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        if (userId == null)
-        {
-            ModelState.AddModelError("", "Không thể xác định người dùng hiện tại.");
-            await PopulateSelectListsAsync();
-            return Page();
-        }
+        var user = userId != null ? await _userManager.FindByIdAsync(userId) : null;
 
-        var user = await _userManager.FindByIdAsync(userId);
-
-        if (user?.Manv != null)
-        {
-            DatHang.Manv = user.Manv.Value;
-        }
-        else
+        if (user?.Manv == null)
         {
             ModelState.AddModelError("", "Không thể xác định được nhân viên lập phiếu.");
             await PopulateSelectListsAsync();
             return Page();
         }
 
-        DatHang.Ctddhs = ChiTietDatHangs;
+        var newDatHang = new QLVT.Web.Data.Models.DatHang
+        {
+            MasoDdh = Input.MasoDdh,
+            Ngay = Input.Ngay,
+            NhaCc = Input.NhaCc,
+            Makho = Input.Makho,
+            Manv = user.Manv.Value,
+            Ctddhs = Input.ChiTiet.Select(ct => new Ctddh
+            {
+                Mavt = ct.Mavt,
+                Soluong = ct.Soluong,
+                Dongia = ct.Dongia
+            }).ToList()
+        };
 
-        db.DatHangs.Add(DatHang);
+        // Lưu vào cơ sở dữ liệu
+        var db = _branchDb.DbContext;
+        db.DatHangs.Add(newDatHang);
         await db.SaveChangesAsync();
 
         return RedirectToPage("./Index");
@@ -95,5 +102,13 @@ public class CreateModel : PageModel
         var db = _branchDb.DbContext;
         KhoSelectList = new SelectList(await db.Khos.ToListAsync(), "Makho", "Tenkho");
         VatTuSelectList = new SelectList(await db.Vattus.ToListAsync(), "Mavt", "Tenvt");
+    }
+
+    private static string GenerateRandomId(int length)
+    {
+        const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+        var random = new Random();
+        return new string(Enumerable.Repeat(chars, length)
+            .Select(s => s[random.Next(s.Length)]).ToArray());
     }
 }

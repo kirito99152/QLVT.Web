@@ -56,7 +56,7 @@ namespace QLVT.Web.Pages.NhanVien
             }
 
             var db = _branchDb.DbContext;
-            var currentBranchCode = db.Database.GetDbConnection().DataSource.Contains("CN1") ? "CN1" : "CN2";
+            var currentBranchCode = User.FindFirst("BranchCode")?.Value;
 
             // Bước 1: Tạo ApplicationUser
             var user = new ApplicationUser
@@ -81,17 +81,30 @@ namespace QLVT.Web.Pages.NhanVien
             // Bước 2: Gán Role cho User
             await _userManager.AddToRoleAsync(user, Input.Role);
 
-            // Bước 3: Tạo NhanVien với Id từ User vừa tạo
-            NhanVien.Manv = Guid.Parse(user.Id); // Lấy Id của user làm Manv
-            NhanVien.Macn = currentBranchCode;
-            NhanVien.TrangThaiXoa = 0; // Mặc định là đang hoạt động
+            try
+            {
+                // Bước 3: Tạo NhanVien với Id từ User vừa tạo
+                NhanVien.Manv = Guid.Parse(user.Id); // Lấy Id của user làm Manv
+                NhanVien.Macn = currentBranchCode;
+                NhanVien.TrangThaiXoa = 0; // Mặc định là đang hoạt động
 
-            db.NhanViens.Add(NhanVien);
-            await db.SaveChangesAsync();
+                db.NhanViens.Add(NhanVien);
+                await db.SaveChangesAsync(); // Lưu NhanVien vào QlvtDbContext
 
-            // Bước 4: Cập nhật lại Manv cho ApplicationUser (để liên kết 2 chiều)
-            user.Manv = NhanVien.Manv;
-            await _userManager.UpdateAsync(user);
+                // Bước 4: Cập nhật lại Manv cho ApplicationUser (để liên kết 2 chiều)
+                user.Manv = NhanVien.Manv;
+                await _userManager.UpdateAsync(user);
+            }
+            catch (Exception)
+            {
+                // Nếu có lỗi khi lưu NhanVien, thực hiện "hoàn tác" bằng cách xóa User đã tạo
+                await _userManager.DeleteAsync(user);
+                
+                // Ghi log và báo lỗi cho người dùng
+                ModelState.AddModelError(string.Empty, "Đã có lỗi xảy ra khi tạo thông tin nhân viên. Vui lòng thử lại.");
+                // Có thể ghi log chi tiết lỗi `ex` ở đây để debug
+                return Page();
+            }
 
             return RedirectToPage("./Index");
         }

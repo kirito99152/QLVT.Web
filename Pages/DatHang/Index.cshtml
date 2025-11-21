@@ -29,10 +29,113 @@
                 <td>@ddh.NhaCc</td>
                 <td>@ddh.ManvNavigation.Ho @ddh.ManvNavigation.Ten</td>
                 <td>
-                    <a asp-page="Details" asp-route-id="@ddh.MasoDdh">Xem</a>
-                    @* Các link Sửa/Xoá sẽ được thêm sau *@
+                    <button type="button" class="btn btn-info btn-sm view-details-btn"
+                            data-bs-toggle="modal" data-bs-target="#detailsModal"
+                            data-id="@ddh.MasoDdh.Trim()">
+                        Xem
+                    </button>
                 </td>
             </tr>
         }
     </tbody>
 </table>
+
+<!-- Modal Chi tiết Đơn hàng -->
+<div class="modal fade" id="detailsModal" tabindex="-1" aria-labelledby="detailsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="detailsModalLabel">Chi tiết Đơn đặt hàng</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="modal-loading" class="text-center">
+                    <div class="spinner-border" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+                <div id="modal-content-details" style="display: none;">
+                    <p><strong>Mã số ĐĐH:</strong> <span id="modalMasoDdh"></span></p>
+                    <p><strong>Ngày lập:</strong> <span id="modalNgay"></span></p>
+                    <p><strong>Nhà cung cấp:</strong> <span id="modalNhaCc"></span></p>
+                    <p><strong>Nhân viên lập:</strong> <span id="modalNhanVien"></span></p>
+                    <hr />
+                    <h6>Chi tiết vật tư</h6>
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Tên vật tư</th>
+                                <th>Số lượng</th>
+                                <th>Đơn giá</th>
+                            </tr>
+                        </thead>
+                        <tbody id="modalChiTietBody">
+                            <!-- Dữ liệu chi tiết sẽ được chèn vào đây -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const detailsModal = new bootstrap.Modal(document.getElementById('detailsModal'));
+            const modalContent = document.getElementById('modal-content-details');
+            const modalLoading = document.getElementById('modal-loading');
+
+            document.querySelectorAll('.view-details-btn').forEach(button => {
+                button.addEventListener('click', function () {
+                    const masoDdh = this.getAttribute('data-id');
+
+                    // Hiển thị loading và ẩn content cũ
+                    modalLoading.style.display = 'block';
+                    modalContent.style.display = 'none';
+
+                    // Gọi handler để lấy dữ liệu
+                    fetch(`?handler=Details&id=${masoDdh}`)
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error('Network response was not ok');
+                            }
+                            return response.json();
+                        })
+                        .then(data => {
+                            // Điền dữ liệu vào modal
+                            document.getElementById('modalMasoDdh').textContent = data.masoDdh;
+                            document.getElementById('modalNgay').textContent = data.ngay;
+                            document.getElementById('modalNhaCc').textContent = data.nhaCc;
+                            document.getElementById('modalNhanVien').textContent = data.nhanVien;
+
+                            const chiTietBody = document.getElementById('modalChiTietBody');
+                            chiTietBody.innerHTML = ''; // Xóa nội dung cũ
+
+                            data.chiTiet.forEach(item => {
+                                const row = `<tr>
+                                                <td>${item.tenVt}</td>
+                                                <td>${item.soLuong}</td>
+                                                <td>${item.donGia.toLocaleString('vi-VN')}</td>
+                                           </tr>`;
+                                chiTietBody.insertAdjacentHTML('beforeend', row);
+                            });
+
+                            // Ẩn loading và hiển thị content
+                            modalLoading.style.display = 'none';
+                            modalContent.style.display = 'block';
+                        })
+                        .catch(error => {
+                            console.error('Lỗi khi lấy chi tiết đơn hàng:', error);
+                            modalContent.innerHTML = '<p class="text-danger">Không thể tải được chi tiết đơn hàng.</p>';
+                            modalLoading.style.display = 'none';
+                            modalContent.style.display = 'block';
+                        });
+                });
+            });
+        });
+    </script>
+}

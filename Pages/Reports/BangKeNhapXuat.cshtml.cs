@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using QLVT.Web.Data;
 using QLVT.Web.Infrastructure.Branches;
 
@@ -22,6 +23,9 @@ namespace QLVT.Web.Pages.Reports
             _lookupDbContext = lookupDbContext;
         }
 
+        public SelectList? ChiNhanhSelectList { get; set; }
+        public string? CurrentBranch { get; private set; }
+
         // Lớp nội bộ để hứng kết quả từ SP
         public class ReportItem
         {
@@ -31,8 +35,17 @@ namespace QLVT.Web.Pages.Reports
             public decimal TongTriGia { get; set; }
         }
 
-        public void OnGet()
+        public async Task<IActionResult> OnGetAsync(string? action, string? type, DateOnly? startDate, DateOnly? endDate, string? branch)
         {
+            // Nếu action là "export", thực hiện logic xuất file
+            if (action == "export" && !string.IsNullOrEmpty(type) && startDate.HasValue && endDate.HasValue)
+            {
+                return await ExportDataAsync(type, startDate.Value, endDate.Value, branch);
+            }
+
+            // Nếu không, chỉ hiển thị trang như bình thường
+            await PreparePageAsync();
+            return Page();
         }
 
         private async Task<List<ReportItem>> GetDataAsync(QlvtDbContext db, string type, DateOnly startDate, DateOnly endDate)
@@ -44,14 +57,25 @@ namespace QLVT.Web.Pages.Reports
                             join vt in db.Vattus on ctpn.Mavt equals vt.Mavt
                             where pn.Ngay >= startDate && pn.Ngay <= endDate
                             group new { ctpn, vt } by new { pn.Ngay.Year, pn.Ngay.Month, vt.Tenvt } into g
-                            select new ReportItem
+                            select new // Tạm thời select ra dữ liệu thô
                             {
-                                ThangNam = $"{g.Key.Month}/{g.Key.Year}",
+                                g.Key.Year,
+                                g.Key.Month,
                                 Tenvt = g.Key.Tenvt,
                                 TongSoLuong = g.Sum(x => x.ctpn.Soluong),
                                 TongTriGia = (decimal)g.Sum(x => x.ctpn.Soluong * x.ctpn.Dongia)
                             };
-                return await query.OrderBy(r => r.ThangNam).ThenBy(r => r.Tenvt).ToListAsync();
+                // Chuyển sang client-side để định dạng lại chuỗi ThangNam
+                var results = await query.ToListAsync();
+                return results
+                    .OrderBy(r => r.Year).ThenBy(r => r.Month).ThenBy(r => r.Tenvt)
+                    .Select(r => new ReportItem
+                    {
+                        ThangNam = $"{r.Month}/{r.Year}",
+                        Tenvt = r.Tenvt,
+                        TongSoLuong = r.TongSoLuong,
+                        TongTriGia = r.TongTriGia
+                    }).ToList();
             }
             else // type == "X"
             {
@@ -61,34 +85,54 @@ namespace QLVT.Web.Pages.Reports
                             where px.Ngay >= startDate && px.Ngay <= endDate
                             // Giả định giá xuất bằng giá trên CTPX, nếu không có thì cần logic khác
                             group new { ctpx, vt } by new { px.Ngay.Year, px.Ngay.Month, vt.Tenvt } into g
-                            select new ReportItem
+                            select new // Tạm thời select ra dữ liệu thô
                             {
-                                ThangNam = $"{g.Key.Month}/{g.Key.Year}",
+                                g.Key.Year,
+                                g.Key.Month,
                                 Tenvt = g.Key.Tenvt,
                                 TongSoLuong = g.Sum(x => x.ctpx.Soluong),
                                 // Giả định CTPX có đơn giá. Nếu không, logic này cần thay đổi.
                                 TongTriGia = (decimal)g.Sum(x => x.ctpx.Soluong * (x.ctpx.Dongia))
                             };
-                return await query.OrderBy(r => r.ThangNam).ThenBy(r => r.Tenvt).ToListAsync();
+                // Chuyển sang client-side để định dạng lại chuỗi ThangNam
+                var results = await query.ToListAsync();
+                return results
+                    .OrderBy(r => r.Year).ThenBy(r => r.Month).ThenBy(r => r.Tenvt)
+                    .Select(r => new ReportItem
+                    {
+                        ThangNam = $"{r.Month}/{r.Year}",
+                        Tenvt = r.Tenvt,
+                        TongSoLuong = r.TongSoLuong,
+                        TongTriGia = r.TongTriGia
+                    }).ToList();
             }
         }
 
-        public async Task<IActionResult> OnGetExportAsync(string type, DateOnly startDate, DateOnly endDate)
+        private async Task<IActionResult> ExportDataAsync(string type, DateOnly startDate, DateOnly endDate, string? branch)
         {
             var allData = new List<ReportItem>();
+            string? chiNhanhValue = branch?.Trim();
 
             if (User.IsInRole("CongTy"))
             {
-                // Lấy danh sách chi nhánh từ DB tra cứu thay vì hard-code
-                var branchNames = await _lookupDbContext.ChiNhanhs.Select(cn => cn.Macn.Trim()).ToListAsync();
-                foreach (var branch in branchNames)
+                if (string.IsNullOrEmpty(chiNhanhValue)) // Nếu không chọn chi nhánh, tổng hợp từ tất cả
                 {
-                    var db = _dbContextFactory(branch);
+                    var branchNames = await _lookupDbContext.ChiNhanhs.Select(cn => cn.Macn.Trim()).ToListAsync();
+                    foreach (var b in branchNames)
+                    {
+                        var db = _dbContextFactory(b);
+                        allData.AddRange(await GetDataAsync(db, type, startDate, endDate));
+                    }
+                }
+                else // Nếu chọn một chi nhánh cụ thể
+                {
+                    var db = _dbContextFactory(chiNhanhValue);
                     allData.AddRange(await GetDataAsync(db, type, startDate, endDate));
                 }
             }
             else
             {
+                // User ChiNhanh/User chỉ xem được dữ liệu của chi nhánh mình
                 var db = _branchDb.DbContext;
                 allData.AddRange(await GetDataAsync(db, type, startDate, endDate));
             }
@@ -131,6 +175,19 @@ namespace QLVT.Web.Pages.Reports
                     string loaiPhieu = type == "N" ? "Nhap" : "Xuat";
                     return File(content, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"BangKeChiTiet_{loaiPhieu}.xlsx");
                 }
+            }
+        }
+
+        private async Task PreparePageAsync()
+        {
+            CurrentBranch = User.FindFirst("BranchCode")?.Value;
+
+            if (User.IsInRole("CongTy"))
+            {
+                var chiNhanhs = await _lookupDbContext.ChiNhanhs
+                    .Select(cn => new { Macn = cn.Macn.Trim(), cn.ChiNhanh1 })
+                    .ToListAsync();
+                ChiNhanhSelectList = new SelectList(chiNhanhs, "Macn", "ChiNhanh1");
             }
         }
     }
