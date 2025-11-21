@@ -1,0 +1,36 @@
+@page
+@model QLVT.Web.Pages.NhanVien.CreateModel
+
+<h1>Sửa nhân viên</h1>
+
+<form method="post">
+    <div class="form-group">
+        <label asp-for="NhanVien.Manv"></label>
+        <input asp-for="NhanVien.Manv" class="form-control" />
+        <span asp-validation-for="NhanVien.Manv" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="NhanVien.Ho"></label>
+        <input asp-for="NhanVien.Ho" class="form-control" />
+        <span asp-validation-for="NhanVien.Ho" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="NhanVien.Ten"></label>
+        <input asp-for="NhanVien.Ten" class="form-control" />
+        <span asp-validation-for="NhanVien.Ten" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="NhanVien.Diachi"></label>
+        <input asp-for="NhanVien.Diachi" class="form-control" />
+        <span asp-validation-for="NhanVien.Diachi" class="text-danger"></span>
+    </div>
+
+    @* MACN không cho sửa, server tự gán *@
+
+    <button type="submit" class="btn btn-primary mt-2">Lưu</button>
+    <a asp-page="Index" class="btn btn-secondary mt-2">Huỷ</a>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

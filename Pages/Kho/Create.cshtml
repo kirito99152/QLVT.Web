@@ -1,0 +1,29 @@
+@page
+@model QLVT.Web.Pages.Kho.CreateModel
+
+<h1>Thêm kho</h1>
+
+<form method="post">
+    <div class="form-group">
+        <label asp-for="Kho.Makho"></label>
+        <input asp-for="Kho.Makho" class="form-control" />
+        <span asp-validation-for="Kho.Makho" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Kho.Tenkho"></label>
+        <input asp-for="Kho.Tenkho" class="form-control" />
+        <span asp-validation-for="Kho.Tenkho" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Kho.Diachi"></label>
+        <input asp-for="Kho.Diachi" class="form-control" />
+        <span asp-validation-for="Kho.Diachi" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary mt-2">Lưu</button>
+    <a asp-page="Index" class="btn btn-secondary mt-2">Huỷ</a>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

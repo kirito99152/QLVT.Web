@@ -1,0 +1,38 @@
+@page
+@model QLVT.Web.Pages.DatHang.IndexModel
+
+<h1>Đơn đặt hàng</h1>
+
+@if (User.IsInRole("ChiNhanh") || User.IsInRole("User"))
+{
+    <p>
+        <a class="btn btn-primary" asp-page="Create">Thêm đơn đặt hàng</a>
+    </p>
+}
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Mã số DDH</th>
+            <th>Ngày</th>
+            <th>Nhà cung cấp</th>
+            <th>Nhân viên lập</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var ddh in Model.DatHangs)
+        {
+            <tr>
+                <td>@ddh.MasoDdh</td>
+                <td>@ddh.Ngay.ToShortDateString()</td>
+                <td>@ddh.NhaCc</td>
+                <td>@ddh.ManvNavigation.Ho @ddh.ManvNavigation.Ten</td>
+                <td>
+                    <a asp-page="Details" asp-route-id="@ddh.MasoDdh">Xem</a>
+                    @* Các link Sửa/Xoá sẽ được thêm sau *@
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

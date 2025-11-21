@@ -1,0 +1,34 @@
+@page
+@model QLVT.Web.Pages.VatTu.EditModel
+
+<h1>Sửa vật tư</h1>
+
+<form method="post">
+    <div class="form-group">
+        <label asp-for="VatTu.Mavt"></label>
+        <input asp-for="VatTu.Mavt" class="form-control" readonly />
+        <span asp-validation-for="VatTu.Mavt" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="VatTu.Tenvt"></label>
+        <input asp-for="VatTu.Tenvt" class="form-control" />
+        <span asp-validation-for="VatTu.Tenvt" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="VatTu.Dvt"></label>
+        <input asp-for="VatTu.Dvt" class="form-control" />
+        <span asp-validation-for="VatTu.Dvt" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="VatTu.Soluongton"></label>
+        <input asp-for="VatTu.Soluongton" class="form-control" />
+        <span asp-validation-for="VatTu.Soluongton" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary mt-2">Lưu</button>
+    <a asp-page="Index" class="btn btn-secondary mt-2">Huỷ</a>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

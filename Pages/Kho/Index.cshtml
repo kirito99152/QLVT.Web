@@ -1,0 +1,39 @@
+@page
+@model QLVT.Web.Pages.Kho.IndexModel
+
+<h1>Kho</h1>
+
+@if (User.IsInRole("ChiNhanh") || User.IsInRole("User"))
+{
+    <p>
+        <a class="btn btn-primary" asp-page="Create">Thêm kho</a>
+    </p>
+}
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Mã kho</th>
+            <th>Tên kho</th>
+            <th>Địa chỉ</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var kho in Model.Khos)
+        {
+            <tr>
+                <td>@kho.Makho</td>
+                <td>@kho.Tenkho</td>
+                <td>@kho.Diachi</td>
+                <td>
+                    @if (User.IsInRole("ChiNhanh") || User.IsInRole("User"))
+                    {
+                        <a asp-page="Edit" asp-route-id="@kho.Makho">Sửa</a>
+                        <a asp-page="Delete" asp-route-id="@kho.Makho">Xoá</a>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

@@ -1,0 +1,18 @@
+@page
+@model QLVT.Web.Pages.VatTu.DeleteModel
+
+<h1>Xoá vật tư</h1>
+
+@if (!string.IsNullOrEmpty(Model.ErrorMessage))
+{
+    <div class="alert alert-danger">@Model.ErrorMessage</div>
+}
+
+<div>
+    <h4>Bạn có chắc muốn xoá vật tư @Model.VatTu.Mavt - @Model.VatTu.Tenvt?</h4>
+</div>
+
+<form method="post">
+    <button type="submit" class="btn btn-danger">Xoá</button>
+    <a asp-page="Index" class="btn btn-secondary">Huỷ</a>
+</form>

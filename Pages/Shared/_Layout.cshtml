@@ -1,0 +1,117 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - QLVT.Web</title>
+    <script type="importmap"></script>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/QLVT.Web.styles.css" asp-append-version="true" />
+</head>
+
+<body>
+    <header>
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+            <div class="container">
+                <a class="navbar-brand" asp-area="" asp-page="/Index">QLVT.Web</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse"
+                    aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+
+                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                    <ul class="navbar-nav flex-grow-1">
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-page="/Index">Trang chủ</a>
+                        </li>
+
+                        <!-- Danh mục -->
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle text-dark" href="#" id="navbarDropdownDanhMuc" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                Danh mục
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="navbarDropdownDanhMuc">
+                                <li><a class="dropdown-item" asp-page="/NhanVien/Index">Nhân viên</a></li>
+                                <li><a class="dropdown-item" asp-page="/VatTu/Index">Vật tư</a></li>
+                                <li><a class="dropdown-item" asp-page="/Kho/Index">Kho</a></li>
+                            </ul>
+                        </li>
+
+                        <!-- Nghiệp vụ -->
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle text-dark" href="#" id="navbarDropdownNghiepVu" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                Nghiệp vụ
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="navbarDropdownNghiepVu">
+                                <li><a class="dropdown-item" asp-page="/DatHang/Index">Đơn đặt hàng</a></li>
+                                <li><a class="dropdown-item" asp-page="/PhieuNhap/Index">Phiếu nhập</a></li>
+                                <li><a class="dropdown-item" asp-page="/PhieuXuat/Index">Phiếu xuất</a></li>
+                            </ul>
+                        </li>
+
+                        <!-- Báo cáo -->
+                        @if (User.Identity?.IsAuthenticated ?? false)
+                        {
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle text-dark" href="#" id="navbarDropdownBaoCao" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    Báo cáo
+                                </a>
+                                <ul class="dropdown-menu" aria-labelledby="navbarDropdownBaoCao">
+                                    @if (User.IsInRole("CongTy") || User.IsInRole("ChiNhanh"))
+                                    {
+                                        <li><a class="dropdown-item" asp-page="/Reports/NhanVien">DS Nhân viên</a></li>
+                                        <li><a class="dropdown-item" asp-page="/Reports/HoatDongNhanVien">Hoạt động nhân viên</a></li>
+                                        <li><a class="dropdown-item" asp-page="/Reports/TongHopNhapXuat">Tổng hợp Nhập Xuất</a></li>
+                                    }
+                                    <li><a class="dropdown-item" asp-page="/Reports/VatTu">Danh mục Vật tư</a></li>
+                                    <li><a class="dropdown-item" asp-page="/Reports/BangKeNhapXuat">Bảng kê Nhập/Xuất</a></li>
+                                    <li><a class="dropdown-item" asp-page="/Reports/DonHangChuaNhap">Đơn hàng chưa có phiếu nhập</a></li>
+                                </ul>
+                            </li>
+                        }
+
+                        <!-- Hệ thống -->
+                        @if (User.IsInRole("CongTy"))
+                        {
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle text-dark" href="#" id="navbarDropdownHeThong" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    Hệ thống
+                                </a>
+                                <ul class="dropdown-menu" aria-labelledby="navbarDropdownHeThong">
+                                    <li><a class="dropdown-item" asp-page="/Branches/Switch">Chọn chi nhánh</a></li>
+                                    <li><a class="dropdown-item" asp-page="/System/ManageAccounts">Quản lý tài khoản</a></li>
+                                    <li><a class="dropdown-item" asp-page="/Lookup/NhanVien">Tra cứu NV (Server 3)</a></li>
+                                </ul>
+                            </li>
+                        }
+
+                    </ul>
+
+                    <partial name="_LoginPartial" />
+                </div>
+            </div>
+        </nav>
+    </header>
+    <div class="container">
+        <main role="main" class="pb-3">
+            @RenderBody()
+        </main>
+    </div>
+
+    <footer class="border-top footer text-muted">
+        <div class="container">
+            &copy; 2025 - QLVT.Web - <a asp-area="" asp-page="/Privacy">Privacy</a>
+        </div>
+    </footer>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+
+</html>

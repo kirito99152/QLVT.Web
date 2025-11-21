@@ -1,0 +1,41 @@
+@page
+@model QLVT.Web.Pages.NhanVien.IndexModel
+
+<h1>Nhân viên</h1>
+
+@if (User.IsInRole("ChiNhanh") || User.IsInRole("User"))
+{
+    <p>
+        <a class="btn btn-primary" asp-page="Create">Thêm nhân viên</a>
+    </p>
+}
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Mã NV</th>
+            <th>Họ</th>
+            <th>Tên</th>
+            <th>Địa chỉ</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var nv in Model.NhanViens)
+        {
+            <tr>
+                <td>@nv.Manv</td>
+                <td>@nv.Ho</td>
+                <td>@nv.Ten</td>
+                <td>@nv.Diachi</td>
+                <td>
+                    @if (User.IsInRole("ChiNhanh") || User.IsInRole("User"))
+                    {
+                        <a asp-page="Edit" asp-route-id="@nv.Manv"> Sửa </a>
+                        <a asp-page="Delete" asp-route-id="@nv.Manv">Xoá</a>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

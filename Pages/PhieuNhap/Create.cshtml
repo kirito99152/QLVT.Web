@@ -1,0 +1,123 @@
+@page
+@model QLVT.Web.Pages.PhieuNhap.CreateModel
+
+<h1>Tạo Phiếu Nhập</h1>
+
+<form method="post">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+    <h4>Thông tin chung</h4>
+    <hr />
+    <div class="row">
+        <div class="col-md-4">
+            <div class="form-group">
+                <label asp-for="PhieuNhap.Mapn" class="control-label"></label>
+                <input asp-for="PhieuNhap.Mapn" class="form-control" />
+                <span asp-validation-for="PhieuNhap.Mapn" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="form-group">
+                <label asp-for="PhieuNhap.Ngay" class="control-label"></label>
+                <input asp-for="PhieuNhap.Ngay" class="form-control" type="date" />
+                <span asp-validation-for="PhieuNhap.Ngay" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="form-group">
+                <label asp-for="PhieuNhap.MasoDdh" class="control-label"></label>
+                <select asp-for="PhieuNhap.MasoDdh" class="form-control" asp-items="Model.DatHangSelectList" id="ddhSelect">
+                    <option value="">-- Chọn Đơn đặt hàng --</option>
+                </select>
+                <span asp-validation-for="PhieuNhap.MasoDdh" class="text-danger"></span>
+            </div>
+        </div>
+    </div>
+
+    <h4 class="mt-4">Chi tiết Nhập kho</h4>
+    <hr />
+
+    <table class="table" id="chiTietTable">
+        <thead>
+            <tr>
+                <th>Vật tư</th>
+                <th>Số lượng đặt</th>
+                <th>Số lượng nhập</th>
+                <th>Đơn giá</th>
+            </tr>
+        </thead>
+        <tbody>
+            @* Các dòng chi tiết sẽ được thêm bằng JavaScript *@
+        </tbody>
+    </table>
+
+    <div class="form-group mt-4">
+        <button type="submit" class="btn btn-primary">Lưu Phiếu Nhập</button>
+        <a asp-page="Index" class="btn btn-light">Huỷ</a>
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        document.getElementById("ddhSelect").addEventListener("change", function () {
+            const masoDdh = this.value;
+            const tableBody = document.querySelector("#chiTietTable tbody");
+            tableBody.innerHTML = ""; // Xoá các dòng cũ
+
+            if (!masoDdh) {
+                return;
+            }
+
+            // Gọi handler trên PageModel để lấy chi tiết DDH
+            fetch(`?handler=ChiTietDatHang&masoDdh=${masoDdh}`)
+                .then(response => response.json())
+                .then(data => {
+                    let rowIndex = 0;
+                    data.forEach(item => {
+                        const newRow = document.createElement("tr");
+
+                        // Cột Vật tư (read-only)
+                        const cellVatTu = newRow.insertCell();
+                        cellVatTu.innerText = `${item.mavt} - ${item.tenVt}`;
+                        const hiddenInputMavt = document.createElement("input");
+                        hiddenInputMavt.type = "hidden";
+                        hiddenInputMavt.name = `ChiTietPhieuNhaps[${rowIndex}].Mavt`;
+                        hiddenInputMavt.value = item.mavt;
+                        cellVatTu.appendChild(hiddenInputMavt);
+
+                        // Cột Số lượng đặt (read-only)
+                        const cellSlDat = newRow.insertCell();
+                        cellSlDat.innerText = item.soluong;
+
+                        // Cột Số lượng nhập (input)
+                        const cellSlNhap = newRow.insertCell();
+                        const inputSlNhap = document.createElement("input");
+                        inputSlNhap.type = "number";
+                        inputSlNhap.className = "form-control";
+                        inputSlNhap.name = `ChiTietPhieuNhaps[${rowIndex}].Soluong`;
+                        inputSlNhap.value = item.soluong; // Mặc định bằng số lượng đặt
+                        inputSlNhap.min = 0;
+                        inputSlNhap.max = item.soluong; // Ràng buộc số lượng tối đa
+                        cellSlNhap.appendChild(inputSlNhap);
+
+                        // Cột Đơn giá (read-only)
+                        const cellDonGia = newRow.insertCell();
+                        cellDonGia.innerText = item.dongia;
+                        const hiddenInputDonGia = document.createElement("input");
+                        hiddenInputDonGia.type = "hidden";
+                        hiddenInputDonGia.name = `ChiTietPhieuNhaps[${rowIndex}].Dongia`;
+                        hiddenInputDonGia.value = item.dongia;
+                        cellDonGia.appendChild(hiddenInputDonGia);
+
+                        tableBody.appendChild(newRow);
+                        rowIndex++;
+                    });
+                })
+                .catch(error => {
+                    console.error("Lỗi khi lấy chi tiết đơn đặt hàng:", error);
+                    alert("Không thể tải chi tiết đơn đặt hàng.");
+                });
+        });
+    </script>
+}

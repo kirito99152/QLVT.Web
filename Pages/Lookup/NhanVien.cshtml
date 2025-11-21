@@ -1,0 +1,26 @@
+@page
+@model QLVT.Web.Pages.Lookup.NhanVienLookupModel
+
+<h1>Tra cứu nhân viên</h1>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Mã NV</th>
+            <th>Họ</th>
+            <th>Tên</th>
+            <th>Mã CN</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var nv in Model.NhanViens)
+        {
+            <tr>
+                <td>@nv.Manv</td>
+                <td>@nv.Ho</td>
+                <td>@nv.Ten</td>
+                <td>@nv.Macn</td>
+            </tr>
+        }
+    </tbody>
+</table>

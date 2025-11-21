@@ -1,0 +1,18 @@
+@page
+@model QLVT.Web.Pages.NhanVien.DeleteModel
+
+<h1>Xoá nhân viên</h1>
+
+@if (!string.IsNullOrEmpty(Model.ErrorMessage))
+{
+    <div class="alert alert-danger">@Model.ErrorMessage</div>
+}
+
+<div>
+    <h4>Bạn có chắc muốn xoá nhân viên @Model.NhanVien.Manv - @Model.NhanVien.Ho @Model.NhanVien.Ten ?</h4>
+</div>
+
+<form method="post">
+    <button type="submit" class="btn btn-danger">Xoá</button>
+    <a asp-page="Index" class="btn btn-secondary">Huỷ</a>
+</form>

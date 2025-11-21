@@ -1,0 +1,60 @@
+@page
+@model QLVT.Web.Pages.Reports.DonHangChuaNhapModel
+@{
+    ViewData["Title"] = "Đơn đặt hàng chưa có Phiếu nhập";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<form method="get" id="reportForm">
+    <div class="row">
+        @if (User.IsInRole("CongTy"))
+        {
+            <div class="col-md-4">
+                <div class="form-group">
+                    <label>Chi nhánh</label>
+                    <select name="branch" class="form-control" asp-items="Model.ChiNhanhSelectList">
+                        <option value="">-- Tất cả chi nhánh --</option>
+                    </select>
+                </div>
+            </div>
+        }
+        <div class="col-md-4 align-self-end">
+            <div class="form-group">
+                @if (!string.IsNullOrEmpty(Model.TenChiNhanh))
+                {
+                    <a class="btn btn-success" asp-page-handler="Export" asp-route-branch="@HttpContext.Request.Query["branch"]">Xuất Excel</a>
+                }
+            </div>
+        </div>
+    </div>
+</form>
+
+@if (Model.ReportData != null && Model.ReportData.Any())
+{
+    <h3 class="mt-4">Danh sách đơn hàng chưa có phiếu nhập (@Model.TenChiNhanh)</h3>
+    <table class="table table-bordered mt-2">
+        <thead>
+            <tr><th>MSĐĐH</th><th>Ngày lập</th><th>Nhà cung cấp</th><th>Họ tên NV</th><th>Tên vật tư</th><th>Số lượng đặt</th><th>Đơn giá</th></tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.ReportData)
+            {
+                <tr><td>@item.MasoDdh</td><td>@item.Ngay.ToShortDateString()</td><td>@item.NhaCc</td><td>@item.HoTenNv</td><td>@item.Tenvt</td><td>@item.Soluong</td><td>@item.Dongia.ToString("N0")</td></tr>
+            }
+        </tbody>
+    </table>
+}
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const branchSelect = document.querySelector('select[name="branch"]');
+            if (branchSelect) {
+                branchSelect.addEventListener('change', function () {
+                    document.getElementById('reportForm').submit();
+                });
+            }
+        });
+    </script>
+}

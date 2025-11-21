@@ -1,0 +1,121 @@
+@page
+@model QLVT.Web.Pages.DatHang.CreateModel
+
+<h1>Thêm đơn đặt hàng</h1>
+
+<form method="post">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+    <h4>Thông tin chung</h4>
+    <hr />
+    <div class="row">
+        <div class="col-md-4">
+            <div class="form-group">
+                <label asp-for="DatHang.MasoDdh" class="control-label"></label>
+                <input asp-for="DatHang.MasoDdh" class="form-control" />
+                <span asp-validation-for="DatHang.MasoDdh" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="form-group">
+                <label asp-for="DatHang.Ngay" class="control-label"></label>
+                <input asp-for="DatHang.Ngay" class="form-control" type="date" />
+                <span asp-validation-for="DatHang.Ngay" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="form-group">
+                <label asp-for="DatHang.NhaCc" class="control-label"></label>
+                <input asp-for="DatHang.NhaCc" class="form-control" />
+                <span asp-validation-for="DatHang.NhaCc" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="form-group">
+                <label asp-for="DatHang.Makho" class="control-label"></label>
+                <select asp-for="DatHang.Makho" class="form-control" asp-items="Model.KhoSelectList">
+                    <option value="">-- Chọn kho --</option>
+                </select>
+                <span asp-validation-for="DatHang.Makho" class="text-danger"></span>
+            </div>
+        </div>
+    </div>
+
+    <h4 class="mt-4">Chi tiết vật tư</h4>
+    <hr />
+
+    <table class="table" id="chiTietTable">
+        <thead>
+            <tr>
+                <th>Vật tư</th>
+                <th>Số lượng</th>
+                <th>Đơn giá</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @* Dòng mẫu để clone, sẽ bị ẩn đi *@
+            <tr id="row_template" style="display: none;">
+                <td>
+                    <select class="form-control item-vattu" asp-items="Model.VatTuSelectList">
+                        <option value="">-- Chọn vật tư --</option>
+                    </select>
+                </td>
+                <td><input type="number" class="form-control item-soluong" value="1" min="1" /></td>
+                <td><input type="number" class="form-control item-dongia" value="0" min="0" /></td>
+                <td><button type="button" class="btn btn-danger btn-sm" onclick="removeRow(this)">Xoá</button></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <button type="button" id="themChiTiet" class="btn btn-secondary">Thêm vật tư</button>
+
+    <div class="form-group mt-4">
+        <button type="submit" class="btn btn-primary">Lưu đơn hàng</button>
+        <a asp-page="Index" class="btn btn-light">Huỷ</a>
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        let rowIndex = 0;
+
+        document.getElementById("themChiTiet").addEventListener("click", function () {
+            const template = document.getElementById("row_template");
+            const newRow = template.cloneNode(true);
+            newRow.style.display = "table-row";
+            newRow.removeAttribute("id");
+
+            // Cập nhật thuộc tính 'name' cho các input để model binding hoạt động
+            newRow.querySelector(".item-vattu").name = `ChiTietDatHangs[${rowIndex}].Mavt`;
+            newRow.querySelector(".item-soluong").name = `ChiTietDatHangs[${rowIndex}].Soluong`;
+            newRow.querySelector(".item-dongia").name = `ChiTietDatHangs[${rowIndex}].Dongia`;
+
+            document.querySelector("#chiTietTable tbody").appendChild(newRow);
+            rowIndex++;
+        });
+
+        function removeRow(button) {
+            button.closest("tr").remove();
+            // Sau khi xoá, cần cập nhật lại index của các dòng còn lại để tránh lỗ hổng trong mảng
+            updateRowIndexes();
+        }
+
+        function updateRowIndexes() {
+            const rows = document.querySelectorAll("#chiTietTable tbody tr:not(#row_template)");
+            rowIndex = 0;
+            rows.forEach(row => {
+                row.querySelector(".item-vattu").name = `ChiTietDatHangs[${rowIndex}].Mavt`;
+                row.querySelector(".item-soluong").name = `ChiTietDatHangs[${rowIndex}].Soluong`;
+                row.querySelector(".item-dongia").name = `ChiTietDatHangs[${rowIndex}].Dongia`;
+                rowIndex++;
+            });
+        }
+
+        // Thêm một dòng mặc định khi tải trang
+        document.addEventListener("DOMContentLoaded", function() {
+            document.getElementById("themChiTiet").click();
+        });
+    </script>
+}

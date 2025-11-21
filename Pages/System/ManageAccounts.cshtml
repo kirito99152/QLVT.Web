@@ -1,0 +1,45 @@
+@page
+@model QLVT.Web.Pages.System.ManageAccountsModel
+@{
+    ViewData["Title"] = "Quản lý tài khoản";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+@if (!string.IsNullOrEmpty(Model.StatusMessage))
+{
+    <div class="alert @(Model.StatusMessage.StartsWith("Lỗi") ? "alert-danger" : "alert-success")">@Model.StatusMessage</div>
+}
+
+<p>
+    <a asp-page="/NhanVien/Create" class="btn btn-primary">Tạo tài khoản mới (kèm nhân viên)</a>
+</p>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Tên đăng nhập</th>
+            <th>Email</th>
+            <th>Vai trò</th>
+            <th>Chi nhánh</th>
+            <th>Mã nhân viên</th>
+            <th>Hành động</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var user in Model.Users)
+        {
+            <tr>
+                <td>@user.UserName</td>
+                <td>@user.Email</td>
+                <td>@user.Roles</td>
+                <td>@user.BranchCode</td>
+                <td>@user.Manv</td>
+                <td>
+                    <a asp-page="./EditUserRole" asp-route-id="@user.UserId" class="btn btn-sm btn-info">Sửa vai trò</a>
+                    <a asp-page="./ChangeUserPassword" asp-route-id="@user.UserId" class="btn btn-sm btn-warning">Đổi mật khẩu</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

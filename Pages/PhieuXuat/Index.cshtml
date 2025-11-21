@@ -1,0 +1,37 @@
+@page
+@model QLVT.Web.Pages.PhieuXuat.IndexModel
+
+<h1>Danh sách Phiếu Xuất</h1>
+
+@if (User.IsInRole("ChiNhanh") || User.IsInRole("User"))
+{
+    <p>
+        <a class="btn btn-primary" asp-page="Create">Tạo Phiếu Xuất</a>
+    </p>
+}
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Mã Phiếu Xuất</th>
+            <th>Ngày</th>
+            <th>Tên khách hàng</th>
+            <th>Nhân viên lập</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var px in Model.PhieuXuats)
+        {
+            <tr>
+                <td>@px.Mapx</td>
+                <td>@px.Ngay.ToShortDateString()</td>
+                <td>@px.Hotenkh</td>
+                <td>@px.ManvNavigation.Ho @px.ManvNavigation.Ten</td>
+                <td>
+                    <a asp-page="Details" asp-route-id="@px.Mapx">Xem</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

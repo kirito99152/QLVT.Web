@@ -1,0 +1,70 @@
+@page
+@model QLVT.Web.Pages.Reports.NhanVienModel
+@{
+    ViewData["Title"] = "Báo cáo Danh sách Nhân viên";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+@if (!string.IsNullOrEmpty(Model.ErrorMessage))
+{
+    <div class="alert alert-danger">@Model.ErrorMessage</div>
+}
+
+<form method="get" id="reportForm">
+    <div class="row">
+        @if (User.IsInRole("CongTy"))
+        {
+            <div class="col-md-4">
+                <div class="form-group">
+                    <label>Chi nhánh</label>
+                    <select name="branch" class="form-control" asp-items="Model.ChiNhanhSelectList">
+                        <option value="">-- Tất cả chi nhánh --</option>
+                    </select>
+                </div>
+            </div>
+        }
+        else
+        {
+            <input type="hidden" name="branch" value="@Model.TenChiNhanh" />
+        }
+        <div class="col-md-4 align-self-end">
+            <div class="form-group">
+                @* Nút Xuất Excel giờ là một link, chỉ hiện khi có chi nhánh được chọn *@
+                @if (!string.IsNullOrEmpty(Model.TenChiNhanh))
+                {
+                    <a class="btn btn-success" asp-page-handler="Export" asp-route-branch="@HttpContext.Request.Query["branch"]">Xuất Excel</a>
+                }
+            </div>
+        </div>
+    </div>
+</form>
+
+@if (Model.NhanViens != null && Model.NhanViens.Any())
+{
+    <h3 class="mt-4">Danh sách nhân viên (@Model.TenChiNhanh)</h3>
+    <table class="table table-bordered mt-2">
+        <thead>
+            <tr><th>Mã NV</th><th>Họ và Tên</th><th>Địa chỉ</th><th>Ngày sinh</th></tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.NhanViens)
+            {
+                <tr><td>@item.Manv</td><td>@item.Ho @item.Ten</td><td>@item.Diachi</td><td>@item.Ngaysinh?.ToShortDateString()</td></tr>
+            }
+        </tbody>
+    </table>
+}
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const branchSelect = document.querySelector('select[name="branch"]');
+            if (branchSelect) {
+                branchSelect.addEventListener('change', function () {
+                    document.getElementById('reportForm').submit();
+                });
+            }
+        });
+    </script>
+}

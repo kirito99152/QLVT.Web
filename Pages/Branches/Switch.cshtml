@@ -1,0 +1,18 @@
+@page
+@model QLVT.Web.Pages.Branches.SwitchModel
+@{
+    ViewData["Title"] = "Chọn chi nhánh";
+}
+
+<h1>Chọn chi nhánh</h1>
+
+<form method="post">
+    <div class="form-group">
+        <label for="SelectedBranch">Chi nhánh</label>
+        <select asp-for="SelectedBranch" class="form-control">
+            <option value="CN1">Chi nhánh 1</option>
+            <option value="CN2">Chi nhánh 2</option>
+        </select>
+    </div>
+    <button type="submit" class="btn btn-primary mt-2">Đổi chi nhánh</button>
+</form>

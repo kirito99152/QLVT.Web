@@ -1,0 +1,65 @@
+@page
+@model QLVT.Web.Pages.NhanVien.CreateModel
+
+<h1>Thêm nhân viên</h1>
+
+<form method="post">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+    <h4>Thông tin cá nhân</h4><hr />
+    <div class="form-group">
+        <label asp-for="NhanVien.Ho"></label>
+        <input asp-for="NhanVien.Ho" class="form-control" />
+        <span asp-validation-for="NhanVien.Ho" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="NhanVien.Ten"></label>
+        <input asp-for="NhanVien.Ten" class="form-control" />
+        <span asp-validation-for="NhanVien.Ten" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="NhanVien.Diachi"></label>
+        <input asp-for="NhanVien.Diachi" class="form-control" />
+        <span asp-validation-for="NhanVien.Diachi" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="NhanVien.Ngaysinh"></label>
+        <input asp-for="NhanVien.Ngaysinh" class="form-control" type="date" />
+        <span asp-validation-for="NhanVien.Ngaysinh" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="NhanVien.Luong"></label>
+        <input asp-for="NhanVien.Luong" class="form-control" type="number" />
+        <span asp-validation-for="NhanVien.Luong" class="text-danger"></span>
+    </div>
+
+    <h4 class="mt-4">Thông tin tài khoản</h4><hr />
+    <div class="form-group">
+        <label asp-for="Input.Email"></label>
+        <input asp-for="Input.Email" class="form-control" />
+        <span asp-validation-for="Input.Email" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Input.Password"></label>
+        <input asp-for="Input.Password" class="form-control" />
+        <span asp-validation-for="Input.Password" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Input.ConfirmPassword"></label>
+        <input asp-for="Input.ConfirmPassword" class="form-control" />
+        <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Input.Role"></label>
+        <select asp-for="Input.Role" class="form-control" asp-items="Model.RoleSelectList"></select>
+    </div>
+
+    @* MACN không cho sửa, server tự gán *@
+
+    <button type="submit" class="btn btn-primary mt-2">Lưu</button>
+    <a asp-page="Index" class="btn btn-secondary mt-2">Huỷ</a>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

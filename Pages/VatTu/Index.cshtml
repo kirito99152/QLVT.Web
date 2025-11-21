@@ -1,0 +1,41 @@
+@page
+@model QLVT.Web.Pages.VatTu.IndexModel
+
+<h1>Vật tư</h1>
+
+@if (User.IsInRole("ChiNhanh") || User.IsInRole("User"))
+{
+    <p>
+        <a class="btn btn-primary" asp-page="Create">Thêm vật tư</a>
+    </p>
+}
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Mã vật tư</th>
+            <th>Tên vật tư</th>
+            <th>Đơn vị tính</th>
+            <th>Số lượng tồn</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.VatTus)
+        {
+            <tr>
+                <td>@item.Mavt</td>
+                <td>@item.Tenvt</td>
+                <td>@item.Dvt</td>
+                <td>@item.Soluongton</td>
+                <td>
+                    @if (User.IsInRole("ChiNhanh") || User.IsInRole("User"))
+                    {
+                        <a asp-page="Edit" asp-route-id="@item.Mavt">Sửa</a>
+                        <a asp-page="Delete" asp-route-id="@item.Mavt">Xoá</a>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
