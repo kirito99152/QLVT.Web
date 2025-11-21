@@ -1,7 +1,7 @@
 # ============================
 # STAGE 1: BUILD (biên dịch)
 # ============================
-FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 
 # Đặt thư mục làm việc bên trong container là /src
 WORKDIR /src
@@ -16,7 +16,7 @@ RUN dotnet publish -c Release -o /app/publish
 # ============================
 # STAGE 2: RUNTIME (chạy app)
 # ============================
-FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS runtime
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
 
 WORKDIR /app
 

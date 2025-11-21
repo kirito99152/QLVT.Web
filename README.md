@@ -24,7 +24,7 @@ docker compose up -d
 Nếu bạn chưa cài đặt công cụ `dotnet-ef` trên máy, hãy chạy lệnh sau. Đây là công cụ cần thiết để quản lý migrations cho cơ sở dữ liệu.
 
 ```bash
-dotnet tool install --global dotnet-ef
+dotnet tool install --global dotnet-ef --version 8.0.11
 ```
 
 ### 3. Tạo và Áp dụng Migrations (Chạy 1 lần)

@@ -1,4 +1,9 @@
 version: '3.8'
+networks:
+  qlvt-net:
+    driver: bridge
+    name: qlvt-net
+
 services:
   cn1:
     image: mcr.microsoft.com/mssql/server:2022-latest
@@ -10,6 +15,8 @@ services:
       - MSSQL_AGENT_ENABLED=true
     volumes:
       - cn1_data:/var/opt/mssql
+    networks:
+      - qlvt-net
   cn2:
     image: mcr.microsoft.com/mssql/server:2022-latest
     ports:
@@ -20,6 +27,8 @@ services:
       - MSSQL_AGENT_ENABLED=true
     volumes:
       - cn2_data:/var/opt/mssql
+    networks:
+      - qlvt-net
   tracuu:
     image: mcr.microsoft.com/mssql/server:2022-latest
     ports:
@@ -30,6 +39,8 @@ services:
       - MSSQL_AGENT_ENABLED=true
     volumes:
       - tracuu_data:/var/opt/mssql
+    networks:
+      - qlvt-net
   auth:
     image: mcr.microsoft.com/mssql/server:2022-latest
     ports:
@@ -40,6 +51,8 @@ services:
       - MSSQL_AGENT_ENABLED=true
     volumes:
       - auth_data:/var/opt/mssql
+    networks:
+      - qlvt-net
 volumes:
   cn1_data:
   cn2_data:
