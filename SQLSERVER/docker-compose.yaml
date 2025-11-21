@@ -1,0 +1,47 @@
+version: '3.8'
+services:
+  cn1:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    ports:
+      - "11430:1433"
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=@Abc1234
+      - MSSQL_AGENT_ENABLED=true
+    volumes:
+      - cn1_data:/var/opt/mssql
+  cn2:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    ports:
+      - "11431:1433"
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=@Abc1234
+      - MSSQL_AGENT_ENABLED=true
+    volumes:
+      - cn2_data:/var/opt/mssql
+  tracuu:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    ports:
+      - "11432:1433"
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=@Abc1234
+      - MSSQL_AGENT_ENABLED=true
+    volumes:
+      - tracuu_data:/var/opt/mssql
+  auth:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    ports:
+      - "11433:1433"
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=@Abc1234
+      - MSSQL_AGENT_ENABLED=true
+    volumes:
+      - auth_data:/var/opt/mssql
+volumes:
+  cn1_data:
+  cn2_data:
+  tracuu_data:
+  auth_data:
